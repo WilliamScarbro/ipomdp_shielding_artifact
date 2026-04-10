@@ -1,0 +1,6 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy==1.26.4
+scipy==1.13.1
+statsmodels==0.14.2
+matplotlib==3.9.2
+torch==2.4.1+cpu

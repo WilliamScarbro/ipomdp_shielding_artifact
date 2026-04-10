@@ -1,0 +1,45 @@
+{
+  "status": "ok",
+  "results": {
+    "uniform/rl/carr": {
+      "fail_rate": 0.075,
+      "stuck_rate": 0.925,
+      "safe_rate": 0.0,
+      "mean_steps": 0.0,
+      "num_trials": 200,
+      "fail_rate_ci_low": 0.042582803737092646,
+      "fail_rate_ci_high": 0.1206842253996613,
+      "stuck_rate_ci_low": 0.8793157746003387,
+      "stuck_rate_ci_high": 0.9574171962629073,
+      "safe_rate_ci_low": 0.0,
+      "safe_rate_ci_high": 0.01827534035513624
+    },
+    "adversarial_opt/rl/carr": {
+      "fail_rate": 0.035,
+      "stuck_rate": 0.965,
+      "safe_rate": 0.0,
+      "mean_steps": 0.0,
+      "num_trials": 200,
+      "fail_rate_ci_low": 0.014185525898419246,
+      "fail_rate_ci_high": 0.0707809983509772,
+      "stuck_rate_ci_low": 0.9292190016490228,
+      "stuck_rate_ci_high": 0.9858144741015807,
+      "safe_rate_ci_low": 0.0,
+      "safe_rate_ci_high": 0.01827534035513624
+    }
+  },
+  "mdp_stats": {
+    "total_supports": 7,
+    "winning_supports": 0,
+    "losing_supports": 7,
+    "pomdp_states": 16
+  },
+  "build_time_s": 0.0,
+  "setup_info": {
+    "rl_agent_cached": "True",
+    "rl_cache_path": "results/cache/prelim_rl_shield_taxinet_agent.pt",
+    "adversarial_opt_targets": "['envelope']",
+    "opt_realization_cached_by_target": "{'envelope': True}",
+    "opt_cache_paths_by_target": "{'envelope': 'results/cache/rl_shield_taxinet_opt_realization.json'}"
+  }
+}

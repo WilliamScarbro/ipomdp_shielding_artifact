@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "case_study": "cartpole_lowacc",
+    "shield": "forward_sampling",
+    "thresholds": [
+      0.5,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95
+    ],
+    "num_trials": 200,
+    "trial_length": 15,
+    "note": "V7: adversarial realizations trained against RL selector. Forward-sampled belief envelope: budget=500, K_samples=100.",
+    "setup_info": {
+      "rl_agent_cached": "True",
+      "rl_cache_path": "results/cache/lowacc_rl_shield_cartpole_agent.pt",
+      "adversarial_opt_targets": "['single_belief']",
+      "opt_realization_cached_by_target": "{'single_belief': True}",
+      "opt_cache_paths_by_target": "{'single_belief': 'results/cache/lowacc_rl_shield_cartpole_opt_realization_single_belief.json'}"
+    }
+  },
+  "sweep_results": {
+    "0.50": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.68,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.03,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.97,
+        "mean_steps": 14.615,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.011087455672254772,
+        "fail_rate_ci_high": 0.064150626705027,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.935849373294973,
+        "safe_rate_ci_high": 0.9889125443277452
+      }
+    },
+    "0.60": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.645,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.655,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      }
+    },
+    "0.65": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.645,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.01,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.99,
+        "mean_steps": 14.85,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.0012133490137360304,
+        "fail_rate_ci_high": 0.035654668397239776,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9643453316027603,
+        "safe_rate_ci_high": 0.998786650986264
+      }
+    },
+    "0.70": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.015,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.985,
+        "mean_steps": 14.775,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.003104107621553509,
+        "fail_rate_ci_high": 0.0432082819177126,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9567917180822874,
+        "safe_rate_ci_high": 0.9968958923784464
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.02,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.98,
+        "mean_steps": 14.715,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.0054755658795564485,
+        "fail_rate_ci_high": 0.05041360908989629,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9495863909101037,
+        "safe_rate_ci_high": 0.9945244341204436
+      }
+    },
+    "0.75": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.625,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.015,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.985,
+        "mean_steps": 14.82,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.003104107621553509,
+        "fail_rate_ci_high": 0.0432082819177126,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9567917180822874,
+        "safe_rate_ci_high": 0.9968958923784464
+      }
+    },
+    "0.80": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.625,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.01,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.99,
+        "mean_steps": 14.85,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.0012133490137360304,
+        "fail_rate_ci_high": 0.035654668397239776,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9643453316027603,
+        "safe_rate_ci_high": 0.998786650986264
+      }
+    },
+    "0.85": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.015,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.985,
+        "mean_steps": 14.775,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.003104107621553509,
+        "fail_rate_ci_high": 0.0432082819177126,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9567917180822874,
+        "safe_rate_ci_high": 0.9968958923784464
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.625,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      }
+    },
+    "0.90": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.02,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.98,
+        "mean_steps": 14.7,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.0054755658795564485,
+        "fail_rate_ci_high": 0.05041360908989629,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9495863909101037,
+        "safe_rate_ci_high": 0.9945244341204436
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.015,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.985,
+        "mean_steps": 14.775,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.003104107621553509,
+        "fail_rate_ci_high": 0.0432082819177126,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9567917180822874,
+        "safe_rate_ci_high": 0.9968958923784464
+      }
+    },
+    "0.95": {
+      "uniform/rl/forward_sampling": {
+        "fail_rate": 0.015,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.985,
+        "mean_steps": 14.775,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.003104107621553509,
+        "fail_rate_ci_high": 0.0432082819177126,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9567917180822874,
+        "safe_rate_ci_high": 0.9968958923784464
+      },
+      "adversarial_opt/rl/forward_sampling": {
+        "fail_rate": 0.025,
+        "stuck_rate": 0.0,
+        "safe_rate": 0.975,
+        "mean_steps": 14.625,
+        "num_trials": 200,
+        "fail_rate_ci_low": 0.008166166190842513,
+        "fail_rate_ci_high": 0.05737435112684586,
+        "stuck_rate_ci_low": 0.0,
+        "stuck_rate_ci_high": 0.01827534035513624,
+        "safe_rate_ci_low": 0.9426256488731541,
+        "safe_rate_ci_high": 0.9918338338091575
+      }
+    }
+  }
+}
