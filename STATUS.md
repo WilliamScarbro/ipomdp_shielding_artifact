@@ -3,8 +3,9 @@
 We are applying for the following EMSOFT artifact badges.
 
 ## Available
-The artifact is archived in a public, persistent repository with a DOI (Zenodo)
-and released under the MIT License (see `LICENSE`). It is self-contained: all
+The artifact is archived in a public, persistent repository with a DOI (Zenodo,
+**[10.5281/zenodo.21539082](https://doi.org/10.5281/zenodo.21539082)**) and
+released under the MIT License (see `LICENSE`). It is self-contained: all
 code, trained controllers, optimized perception realizations, and result data
 needed to reproduce every figure and table in the paper are included.
 

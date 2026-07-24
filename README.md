@@ -1,5 +1,9 @@
 # IPOMDP Shielding — Paper Artifact
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21539082.svg)](https://doi.org/10.5281/zenodo.21539082)
+
+Archived at **[10.5281/zenodo.21539082](https://doi.org/10.5281/zenodo.21539082)**.
+
 Reproducible artifact for the paper *Interval POMDP Shielding for
 Imperfect-Perception Agents*. It bundles the experiment code, the trained
 controllers, and the result data needed to reproduce every figure and table in
