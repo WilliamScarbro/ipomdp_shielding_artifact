@@ -11,3 +11,11 @@ dist/
 # experiment runners; the canonical figure outputs live in figures/.
 results/**/*.png
 results/sweep_v7/evaluation_summary.md
+
+# LaTeX build artifacts for the artifact appendix (PDF is uploaded separately)
+artifact_appendix.pdf
+*.aux
+*.fls
+*.fdb_latexmk
+*.out
+*.log

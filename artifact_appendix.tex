@@ -1,0 +1,115 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\hypersetup{colorlinks=true, urlcolor=blue, linkcolor=black}
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.2ex}{0.6ex}
+\setlist{nosep, leftmargin=1.4em}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{\vspace{-2.5em}\textbf{Artifact Appendix:\\ Interval POMDP Shielding for Imperfect-Perception Agents}}
+\author{William Scarbro \and Ravi Mangal}
+\date{EMSOFT 2026 --- Artifact Evaluation}
+
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+
+\section*{Abstract}
+This artifact reproduces every figure and table in \emph{Interval POMDP Shielding
+for Imperfect-Perception Agents}. It contains the experiment code, the trained
+DQN controllers, the optimized adversarial perception realizations, and the
+bundled result data, together with a Docker recipe for a self-contained,
+CPU-only environment. The artifact evaluates five runtime shields
+(\textbf{Envelope}, \textbf{Single-Belief}, \textbf{Observation}, \textbf{Carr},
+\textbf{Fwd-Sampling}) on four benchmarks (\textbf{TaxiNet}, \textbf{Obstacle},
+\textbf{CartPole}, \textbf{Refuel}). Everything runs through two commands:
+a fast \code{smoke\_test} (${\sim}2$\,min) that regenerates all figures/tables
+from bundled data, and a full \code{reproduce\_results} (${\sim}12$\,h) that
+re-executes the underlying Monte Carlo experiments.
+
+\section*{Artifact check-list (meta-information)}
+\begin{itemize}
+  \item \textbf{Algorithms:} interval-POMDP runtime shielding; LP envelope
+        over-approximation; forward sampling; Cross-Entropy Method for
+        adversarial realization optimization; Clopper--Pearson confidence intervals.
+  \item \textbf{Program:} Python 3.11 package \code{ipomdp\_shielding}.
+  \item \textbf{Model:} bundled DQN controllers (\code{results/cache/*\_agent.pt}); no retraining required.
+  \item \textbf{Data set:} bundled result JSONs, perception realizations, and
+        TaxiNet point-estimate CSVs (all included; no external download).
+  \item \textbf{Run-time environment:} Docker (base image \code{python:3.11-slim}); CPU-only; no network at run time.
+  \item \textbf{Hardware:} any x86-64 machine; ${\ge}8$\,GB RAM; ${\sim}1$\,GB disk. No GPU.
+  \item \textbf{Metrics:} failure / stuck / safe rates; per-step shield latency; envelope coarseness.
+  \item \textbf{Output:} figures written to \code{figures/}; tables printed to stdout.
+  \item \textbf{Experiments:} \code{./run\_experiments.sh smoke\_test} and \code{reproduce\_results}.
+  \item \textbf{How much disk space required?} ${\sim}1$\,GB (image + artifact).
+  \item \textbf{How much time to prepare workflow?} ${\sim}5$\,min (\code{docker build}).
+  \item \textbf{How much time to complete experiments?} \code{smoke\_test} ${\sim}2$\,min; \code{reproduce\_results} ${\sim}12$\,h.
+  \item \textbf{Publicly available?} Yes. \item \textbf{Code license:} MIT.
+  \item \textbf{Archived (DOI):} \href{https://doi.org/10.5281/zenodo.21539082}{10.5281/zenodo.21539082}.
+\end{itemize}
+
+\section*{Description}
+\subsection*{How to access}
+Archived on Zenodo at \href{https://doi.org/10.5281/zenodo.21539082}{10.5281/zenodo.21539082}
+(MIT-licensed). Source is also at
+\url{https://github.com/WilliamScarbro/ipomdp_shielding_artifact}.
+
+\subsection*{Hardware dependencies}
+Any x86-64 machine. CPU-only --- no GPU. ${\ge}8$\,GB RAM (the figure path uses
+well under 2\,GB) and ${\sim}1$\,GB free disk.
+
+\subsection*{Software dependencies}
+Docker Engine only; the image pins the full environment. For reference, the
+reproduction path depends solely on \code{numpy 1.26.4}, \code{scipy 1.13.1},
+\code{statsmodels 0.14.2}, \code{matplotlib 3.9.2}, and \code{torch 2.4.1} (CPU
+build), as pinned in \code{requirements.txt}.
+
+\section*{Installation}
+From the artifact root:
+\begin{verbatim}
+docker build -t ipomdp-shielding .
+\end{verbatim}
+
+\section*{Experiment workflow}
+Both commands write the paper figures into \code{figures/}; mount a host directory there.
+\begin{verbatim}
+# Fast check + regenerate all figures/tables from bundled data (default CMD, ~2 min):
+docker run --rm -v "$PWD/figures:/artifact/figures" ipomdp-shielding
+
+# Full reproduction: rerun all Monte Carlo experiments, then replot (~12 h):
+docker run --rm -v "$PWD/figures:/artifact/figures" ipomdp-shielding \
+    ./run_experiments.sh reproduce_results
+\end{verbatim}
+\code{smoke\_test} finishes with \code{[smoke] ALL CHECKS PASSED}. \code{reproduce\_results}
+reuses the bundled trained agents and optimized realizations (no retraining) and
+overwrites the result JSONs under \code{results/} before replotting.
+
+\section*{Evaluation and expected results}
+After either command, \code{figures/} contains the regenerated plots and the
+supplement tables are printed to stdout:
+\begin{itemize}
+  \item Fig.~1/2 --- main summary bars: \code{summary\_v7\_bars.png}, \code{summary\_v7\_safe\_bars.png}
+  \item Fig.~3 --- Pareto: \code{pareto\_v7\_taxinet.png}, \code{pareto\_v7\_obstacle.png}
+  \item Fig.~4 --- conformal comparison: \code{taxinet\_v2\_extremal\_comparison.png} (+ Table~3 to stdout)
+  \item Shield timing: \code{inference\_timing\_summary.pdf}
+  \item Coarseness: \code{coarse\_taxinet\_results.png}; Perception variability: \code{perception\_variability\_taxinet.png}
+  \item Alpha sweep: \code{alpha\_sweep\_taxinet\_\{fail,stuck,safe\}.png}
+  \item Tables~1--3 printed to stdout.
+\end{itemize}
+Regenerated figures and printed tables match the paper; e.g.\ the conformal
+comparison (Fig.~4 / Table~3) reproduces exactly and the summary/Pareto figures
+are byte-for-byte equivalent to the submission. A full command-to-figure mapping
+is in \code{README.md}.
+
+\section*{Badges claimed}
+\textbf{Available} (public Zenodo DOI, MIT license), \textbf{Reviewed/Functional}
+(\code{smoke\_test} regenerates all outputs and exercises the live shielding
+pipeline), and \textbf{Reproducible} (\code{reproduce\_results} recomputes the
+underlying results). See \code{STATUS.md} for per-badge justification.
+
+\end{document}
