@@ -105,13 +105,19 @@ class ObservationActionEncoder:
 
         sample = items[0]
 
-        # Check if tuple
+        # Check if tuple.  Only use "tuple" mode for *flat* tuples (all scalar
+        # elements), e.g. (cte, he) point estimates.  Nested tuples such as
+        # conformal prediction sets ((cte_set,), (he_set,)) must be treated as
+        # discrete tokens to avoid ragged-array encoding errors.
         if isinstance(sample, tuple):
-            return "tuple"
+            if all(not isinstance(elem, tuple) for elem in sample):
+                return "tuple"
+            # Nested tuple — always use discrete token encoding regardless of count.
+            return "discrete"
 
         # Check if discrete (small number of unique values)
         unique_items = set(items)
-        if len(unique_items) <= 20:  # Treat as discrete if <= 20 unique values
+        if len(unique_items) <= 60:  # Treat as discrete if <= 60 unique values
             return "discrete"
 
         # Otherwise treat as scalar
@@ -131,7 +137,8 @@ class ObservationActionEncoder:
     def _build_vocab(self, items: List[Any], mode: str) -> Dict[Any, int]:
         """Build vocabulary for discrete items."""
         if mode == "discrete":
-            return {item: idx for idx, item in enumerate(sorted(set(items)))}
+            # Use repr() as sort key to handle mixed types (e.g. str + tuple).
+            return {item: idx for idx, item in enumerate(sorted(set(items), key=repr))}
         return {}
 
     def _get_dim(self, sample: Any, mode: str, vocab: Dict[Any, int]) -> int:
@@ -669,46 +676,54 @@ class NeuralActionSelector(RLActionSelector):
             history = []
             total_reward = 0.0
             outcome = "safe"
+            perception_context = {"history": history}
+            perception.begin_trajectory(ipomdp, perception_context)
+            try:
+                for step in range(episode_length):
+                    # Check for failure
+                    if state == "FAIL":
+                        reward = self._compute_reward("fail")
+                        self._store_transition(history, action, reward, history, done=True)
+                        total_reward += reward
+                        outcome = "fail"
+                        break
 
-            for step in range(episode_length):
-                # Check for failure
-                if state == "FAIL":
-                    reward = self._compute_reward("fail")
-                    self._store_transition(history, action, reward, history, done=True)
-                    total_reward += reward
-                    outcome = "fail"
-                    break
+                    # Get observation (no shield in context)
+                    obs = perception.sample_observation(
+                        state,
+                        ipomdp,
+                        context=perception_context,
+                    )
+                    history.append((obs, action))
 
-                # Get observation (no shield in context)
-                obs = perception.sample_observation(state, ipomdp, context={})
-                history.append((obs, action))
+                    # Step reward
+                    step_reward = self._compute_reward("step")
 
-                # Step reward
-                step_reward = self._compute_reward("step")
+                    # Select next action (ignore shield constraints)
+                    next_action = self.select(history, self.actions)
 
-                # Select next action (ignore shield constraints)
-                next_action = self.select(history, self.actions)
+                    # Store transition
+                    prev_history = history[:-1] if len(history) > 1 else []
+                    self._store_transition(
+                        prev_history=prev_history,
+                        action=action,
+                        reward=step_reward,
+                        next_history=history,
+                        done=False
+                    )
+                    total_reward += step_reward
 
-                # Store transition
-                prev_history = history[:-1] if len(history) > 1 else []
-                self._store_transition(
-                    prev_history=prev_history,
-                    action=action,
-                    reward=step_reward,
-                    next_history=history,
-                    done=False
-                )
-                total_reward += step_reward
+                    # Update action for next iteration
+                    action = next_action
 
-                # Update action for next iteration
-                action = next_action
+                    # Evolve state (direct IPOMDP dynamics, no shield)
+                    state = ipomdp.evolve(state, action)
 
-                # Evolve state (direct IPOMDP dynamics, no shield)
-                state = ipomdp.evolve(state, action)
-
-                # Train network
-                if len(self.replay_buffer) >= self.batch_size:
-                    loss = self._train_step()
+                    # Train network
+                    if len(self.replay_buffer) >= self.batch_size:
+                        loss = self._train_step()
+            finally:
+                perception.end_trajectory()
 
             # Episode completion
             if outcome == "safe":

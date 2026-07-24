@@ -1,4 +1,4 @@
-"""Threshold sweep for the artifact forward-sampling shield bundle.
+"""Threshold sweep for the forward-sampling shield across all v5 case studies.
 
 Sweeps shield_threshold ∈ [0.50, 0.60, ..., 0.95] for the
 ForwardSampledBelief-based shield (forward-sampled belief envelope) using the
@@ -7,7 +7,10 @@ RL selector and both perception regimes (uniform + adversarial_opt).
 Case studies: TaxiNet, Obstacle, CartPole (low-accuracy), Refuel v2.
 Forward sampling is feasible for all four (no LP required).
 
-Uses the bundled cached RL agents and optimized realizations from the artifact.
+Reuses existing RL-agent and adversarial-realization caches from prior runs.
+
+Usage:
+    python -m ipomdp_shielding.experiments.run_forward_sampling_sweep
 """
 
 import dataclasses
@@ -22,24 +25,26 @@ from .run_rl_shield_experiment import setup, build_grid, run_experiment
 
 THRESHOLDS = [0.50, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
 
-OUTPUT_DIR = "results/experiment/fs"
+OUTPUT_DIR = "results/forward_sampling_sweep"
 
+# Case study parameters: num_trials, trial_length, config_module name.
+# Matches the v5 setup (200 trials, same variants as plot_sweep_v5.py).
 SWEEP_CASES = {
     "taxinet": {
         "num_trials": 200, "trial_length": 20,
-        "config_name": "rl_shield_taxinet_artifact",
+        "config_name": "rl_shield_taxinet_final",
     },
     "obstacle": {
         "num_trials": 200, "trial_length": 25,
-        "config_name": "rl_shield_obstacle_artifact",
+        "config_name": "rl_shield_obstacle_final",
     },
     "cartpole_lowacc": {
         "num_trials": 200, "trial_length": 15,
-        "config_name": "rl_shield_cartpole_lowacc_artifact",
+        "config_name": "rl_shield_cartpole_lowacc",
     },
     "refuel_v2": {
         "num_trials": 200, "trial_length": 30,
-        "config_name": "rl_shield_refuel_v2_artifact",
+        "config_name": "rl_shield_refuel_v2",
     },
 }
 
@@ -136,7 +141,7 @@ def save_sweep(cs_name, sweep_results, base_config, params, setup_info):
             "base_config_rl_cache_path": base_config.rl_cache_path,
             "base_config_opt_cache_path": base_config.opt_cache_path,
             "note": (
-                "Adversarial perception realizations loaded from artifact caches. "
+                "Adversarial perception realizations reused from prior runs. "
                 "Forward-sampled belief envelope: budget=100 points, K_samples=10."
             ),
             "setup_info": {k: str(v) for k, v in setup_info.items()},

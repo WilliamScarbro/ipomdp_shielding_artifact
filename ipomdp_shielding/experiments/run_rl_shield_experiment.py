@@ -7,7 +7,7 @@ Usage:
     python -m ipomdp_shielding.experiments.run_rl_shield_experiment <config_module>
 
 Example:
-    python -m ipomdp_shielding.experiments.run_rl_shield_experiment configs.rl_shield_taxinet_artifact
+    python -m ipomdp_shielding.experiments.run_rl_shield_experiment configs.rl_shield_taxinet_prelim
 """
 
 import os
@@ -220,6 +220,88 @@ def create_forward_sampling_shield_factory(ipomdp, pp_shield, threshold=0.8,
     return factory
 
 
+class ConformalPredictionShield:
+    """Memoryless shield using conformal prediction-set observations.
+
+    Designed for case studies (e.g. TaxiNetV2) where the observation is a
+    conformal prediction set: a tuple of axis-wise sets
+    ``(cte_set, he_set)`` enumerating possible true state values on each axis.
+
+    An action is allowed iff it is safe for *every* state in the Cartesian
+    product of the conformal set.  This is the exact runtime counterpart of
+    the Scarbro PRISM-based shielding approach, evaluated empirically rather
+    than via formal model checking.
+
+    If an axis is empty (the conformal set omitted that axis), the shield
+    falls back to the full axis range supplied at construction time, which is
+    the most conservative choice.  The string sentinel "FAIL" as observation
+    is treated as stuck (no actions allowed).
+    """
+
+    def __init__(self, pp_shield, all_actions, cte_states=None, he_states=None):
+        self.pp_shield = pp_shield
+        self.all_actions = list(all_actions)
+        self._cte_states = list(cte_states) if cte_states else []
+        self._he_states = list(he_states) if he_states else []
+        self.stuck_count = 0
+        self.error_count = 0
+
+    def next_actions(self, evidence):
+        obs, _action = evidence
+
+        if obs == "FAIL":
+            self.stuck_count += 1
+            return []
+
+        cte_set, he_set = obs
+
+        effective_cte = list(cte_set) if cte_set else self._cte_states
+        effective_he = list(he_set) if he_set else self._he_states
+
+        if not effective_cte or not effective_he:
+            self.stuck_count += 1
+            return []
+
+        allowed = set(self.all_actions)
+        for cte in effective_cte:
+            for he in effective_he:
+                allowed &= self.pp_shield.get((cte, he), set())
+
+        if not allowed:
+            self.stuck_count += 1
+        return list(allowed)
+
+    def get_action_probs(self):
+        return []
+
+    def restart(self):
+        self.stuck_count = 0
+        self.error_count = 0
+
+    def initialize(self, _initial_state):
+        self.restart()
+
+
+def create_conformal_shield_factory(pp_shield, all_actions,
+                                    cte_states=None, he_states=None):
+    """Factory for ConformalPredictionShield.
+
+    Parameters
+    ----------
+    pp_shield : dict
+        Perfect-perception shield: state -> set of safe actions.
+    all_actions : list
+        Full action space.
+    cte_states : list, optional
+        All possible CTE state values (fallback for empty conformal axis).
+    he_states : list, optional
+        All possible HE state values (fallback for empty conformal axis).
+    """
+    def factory():
+        return ConformalPredictionShield(pp_shield, all_actions, cte_states, he_states)
+    return factory
+
+
 # ============================================================
 # Action selector wrapper for RL
 # ============================================================
@@ -377,7 +459,7 @@ def build_grid(ipomdp, pp_shield, rl_selector, optimized_perceptions, config):
     Factors:
       - Perception: uniform, adversarial_opt
       - Selector: random, best, rl
-      - Shield: none, observation, single_belief, envelope
+      - Shield: none, observation, single_belief, envelope, forward_sampling
 
     Returns list of (p_name, s_name, sh_name,
                      perception, selector, shield_factory) tuples.
@@ -554,19 +636,23 @@ def plot_results(trial_data, config, intervention_stats=None):
 
     perceptions = ["uniform", "adversarial_opt"]
     outcomes = ["fail", "stuck"]
-    shield_order = ["none", "observation", "single_belief", "envelope"]
+    shield_order = ["none", "observation", "single_belief", "envelope", "forward_sampling", "conformal_prediction"]
 
     shield_labels = {
         "none": "No Shield",
         "observation": "Observation Shield",
         "single_belief": "Single-Belief Shield",
         "envelope": "Envelope Shield",
+        "forward_sampling": "Forward-Sampling Shield",
+        "conformal_prediction": "Conf. Pred. Shield",
     }
     shield_colors = {
         "none": "gray",
         "observation": "orange",
         "single_belief": "blue",
         "envelope": "green",
+        "forward_sampling": "teal",
+        "conformal_prediction": "red",
     }
     perception_labels = {
         "uniform": "Uniform Random",
@@ -671,7 +757,7 @@ def print_results_table(results, config):
     print("=" * 90)
     for p_name in ["uniform", "adversarial_opt"]:
         print(f"\n  Perception: {p_name}")
-        for sh_name in ["none", "observation", "single_belief", "envelope"]:
+        for sh_name in ["none", "observation", "single_belief", "envelope", "forward_sampling", "conformal_prediction"]:
             key = (p_name, "rl", sh_name)
             if key in results:
                 m = results[key]
@@ -737,6 +823,13 @@ def save_results(results, config, setup_info=None):
         "observation": f"ObservationShield (midpoint posterior, threshold={config.shield_threshold})",
         "single_belief": f"SingleBeliefShield (POMDP belief, threshold={config.shield_threshold})",
         "envelope": f"RuntimeImpShield (LFP polytope, threshold={config.shield_threshold})",
+        "forward_sampling": (
+            f"ForwardSamplingShield (forward-sampled belief envelope, threshold={config.shield_threshold})"
+        ),
+        "conformal_prediction": (
+            "ConformalPredictionShield (memoryless; allows action iff safe for all states "
+            "in the conformal set; TaxiNetV2 only)"
+        ),
     }
 
     metadata = build_metadata(config, extra=extra_meta)
@@ -781,7 +874,7 @@ def run_rl_experiment(config):
     # Build 3-factor grid
     grid = build_grid(ipomdp, pp_shield, rl_selector, optimized_perceptions, config)
     print(f"\nExperiment grid: {len(grid)} combinations "
-          f"(2 perceptions x 3 selectors x 4 shields)")
+          f"(2 perceptions x 3 selectors x 5 shields)")
 
     # Run all combinations
     t0 = time.time()
@@ -811,7 +904,7 @@ def run_rl_experiment(config):
 def main():
     if len(sys.argv) < 2:
         print("Usage: python -m ipomdp_shielding.experiments.run_rl_shield_experiment <config_module>")
-        print("Example: python -m ipomdp_shielding.experiments.run_rl_shield_experiment configs.rl_shield_taxinet_artifact")
+        print("Example: python -m ipomdp_shielding.experiments.run_rl_shield_experiment configs.rl_shield_taxinet_prelim")
         sys.exit(1)
 
     # Import config

@@ -5,11 +5,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     MPLBACKEND=Agg
 
 WORKDIR /artifact
-
 COPY . /artifact
 
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt \
     && pip install --no-deps -e .
 
-CMD ["python", "scripts/smoke_test.py"]
+# Default: regenerate every paper figure/table from the bundled results into ./figures
+CMD ["./run_experiments.sh", "figures"]

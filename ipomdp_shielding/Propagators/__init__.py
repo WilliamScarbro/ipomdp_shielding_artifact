@@ -11,6 +11,7 @@ from .forward_sampled_belief import (
     LikelihoodSamplingStrategy,
     PruningStrategy,
 )
+from .fixed_realization_sampled_belief import FixedRealizationSampledBelief
 from .belief_support_propagator import BeliefSupportPropagator
 
 __all__ = [
@@ -26,5 +27,6 @@ __all__ = [
     'ForwardSampledBelief',
     'LikelihoodSamplingStrategy',
     'PruningStrategy',
+    'FixedRealizationSampledBelief',
     'BeliefSupportPropagator',
 ]

@@ -1,6 +1,10 @@
 """Shield evaluation and runtime shield construction."""
 
 from .runtime_shield import RuntimeImpShield
+from .conformal_set_shield import (
+    ConformalSetIntersectionShield,
+    load_cp_control_tempest_shield,
+)
 from .shield_evaluator import evaluate_runtime_shield
 from .support_mdp_builder import SupportMDPBuilder
 from .carr_shield import CarrShield
@@ -101,6 +105,8 @@ from ..MonteCarlo import (
 
 __all__ = [
     'RuntimeImpShield',
+    'ConformalSetIntersectionShield',
+    'load_cp_control_tempest_shield',
     'evaluate_runtime_shield',
     'SupportMDPBuilder',
     'CarrShield',

@@ -1,10 +1,14 @@
-"""Threshold sweep experiment for the artifact bundle.
+"""Threshold sweep experiment: Pareto frontier of fail rate vs stuck rate.
 
 Sweeps shield_threshold ∈ [0.50, 0.60, ..., 0.95] for single_belief and
 envelope shields, with RL selector and both perception regimes.
 
-Uses the bundled cached RL agents and optimized realizations and writes
-per-case-study JSON files into the artifact results tree.
+Reuses prelim caches (RL agent, optimized realizations) from the final run.
+Saves per-case-study JSON files to results/threshold_sweep/.
+
+Usage:
+    python -m ipomdp_shielding.experiments.run_threshold_sweep             # original
+    python -m ipomdp_shielding.experiments.run_threshold_sweep --expanded  # 200-trial v2
 """
 
 import dataclasses
@@ -24,13 +28,31 @@ from .run_rl_shield_experiment import (
 
 THRESHOLDS = [0.50, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
 
+# Original sweep parameters (v1).
 SWEEP_PARAMS = {
-    "taxinet": {"num_trials": 200, "trial_length": 20, "exclude_envelope": False, "config_name": "rl_shield_taxinet_artifact"},
-    "obstacle": {"num_trials": 200, "trial_length": 25, "exclude_envelope": False, "config_name": "rl_shield_obstacle_artifact"},
-    "cartpole_lowacc": {"num_trials": 200, "trial_length": 15, "exclude_envelope": True, "config_name": "rl_shield_cartpole_lowacc_artifact"},
-    "refuel_v2": {"num_trials": 200, "trial_length": 30, "exclude_envelope": True, "config_name": "rl_shield_refuel_v2_artifact"},
+    "taxinet":  {"num_trials": 50,  "trial_length": 20, "exclude_envelope": False},
+    "cartpole": {"num_trials": 15,  "trial_length": 15, "exclude_envelope": False},
+    "obstacle": {"num_trials": 25,  "trial_length": 25, "exclude_envelope": False},
+    "refuel":   {"num_trials": 30,  "trial_length": 30, "exclude_envelope": True},
 }
-OUTPUT_DIR = "results/experiment/threshold"
+
+# Expanded sweep (v2): 200 trials, CartPole envelope excluded (dominated by
+# single_belief), Refuel upgraded to v2 (safety predicates hidden from obs).
+EXPANDED_PARAMS = {
+    "taxinet":  {"num_trials": 200, "trial_length": 20, "exclude_envelope": False},
+    "cartpole": {"num_trials": 200, "trial_length": 15, "exclude_envelope": True},
+    "obstacle": {"num_trials": 200, "trial_length": 25, "exclude_envelope": False},
+    # config_name overrides the default rl_shield_{cs}_final lookup.
+    "refuel_v2": {"num_trials": 200, "trial_length": 30, "exclude_envelope": True,
+                  "config_name": "rl_shield_refuel_v2"},
+    # Low-accuracy CartPole: perception trained on 175 ep (P_mid≈0.373 ≈ TaxiNet).
+    # Envelope excluded (too slow for marginal benefit at this accuracy level).
+    "cartpole_lowacc": {"num_trials": 200, "trial_length": 15, "exclude_envelope": True,
+                        "config_name": "rl_shield_cartpole_lowacc"},
+}
+
+OUTPUT_DIR = "results/threshold_sweep"
+EXPANDED_OUTPUT_DIR = "results/threshold_sweep_expanded"
 
 
 def _load_base_config(cs_name, config_name=None):
@@ -41,10 +63,10 @@ def _load_base_config(cs_name, config_name=None):
     cs_name : str
         Case study identifier (used as fallback module suffix).
     config_name : str, optional
-        Explicit config module name.
-        Defaults to 'rl_shield_{cs_name}_artifact'.
+        Explicit config module name (e.g. 'rl_shield_refuel_v2').
+        Defaults to 'rl_shield_{cs_name}_final'.
     """
-    module = config_name if config_name else f"rl_shield_{cs_name}_artifact"
+    module = config_name if config_name else f"rl_shield_{cs_name}_final"
     mod = importlib.import_module(
         f".configs.{module}",
         package="ipomdp_shielding.experiments",
@@ -109,7 +131,7 @@ def run_sweep_for_case_study(cs_name, params):
     print(f"  States: {len(ipomdp.states)}, Actions: {len(ipomdp.actions)}, "
           f"Observations: {len(ipomdp.observations)}")
 
-    # Load bundled RL agents and optimized realizations once.
+    # Load RL agent and optimized realizations once (hits prelim caches every time).
     rl_selector, optimized_perceptions, setup_info = setup(ipomdp, pp_shield, sweep_config)
 
     sweep_results = {}
@@ -159,9 +181,9 @@ def save_sweep(cs_name, sweep_results, base_config, params, setup_info, output_d
             "base_config_rl_cache_path": base_config.rl_cache_path,
             "base_config_opt_cache_path": base_config.opt_cache_path,
             "note": (
-                "Adversarial perception realizations are loaded from bundled caches "
-                "(trained at threshold=0.8). Retraining per threshold is not part "
-                "of the artifact."
+                "Adversarial perception realizations are reused from prelim caches "
+                "(trained at threshold=0.8). This is a documented limitation — "
+                "retraining per threshold would require weeks of compute."
             ),
             "setup_info": {k: str(v) for k, v in setup_info.items()},
         },
@@ -176,10 +198,17 @@ def save_sweep(cs_name, sweep_results, base_config, params, setup_info, output_d
 
 
 def main():
+    expanded = "--expanded" in sys.argv
+    sweep_params = EXPANDED_PARAMS if expanded else SWEEP_PARAMS
+    output_dir = EXPANDED_OUTPUT_DIR if expanded else OUTPUT_DIR
+
     overall_start = time.time()
-    output_dir = OUTPUT_DIR
-    sweep_params = SWEEP_PARAMS
     os.makedirs(output_dir, exist_ok=True)
+
+    if expanded:
+        print("=" * 70)
+        print("EXPANDED THRESHOLD SWEEP (200 trials, Refuel v2, CartPole env excluded)")
+        print("=" * 70)
 
     timings = {}
 

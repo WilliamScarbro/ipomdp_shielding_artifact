@@ -43,12 +43,19 @@ class CoarsenessStepResult:
         Maximum disallowed probability from LFP over-approximation.
     max_disallowed_sampled : float
         Maximum disallowed probability from sampled under-approximation.
+    extra_min_allowed : dict, optional
+        Map name -> min_allowed for additional propagators (e.g. a fixed-realization
+        sampler running alongside the main varying sampler).
+    extra_max_disallowed : dict, optional
+        Map name -> max_disallowed for the same additional propagators.
     """
     action: Any
     min_allowed_lfp: float
     min_allowed_sampled: float
     max_disallowed_lfp: float
     max_disallowed_sampled: float
+    extra_min_allowed: Dict[str, float] = field(default_factory=dict)
+    extra_max_disallowed: Dict[str, float] = field(default_factory=dict)
 
     @property
     def safe_gap(self) -> float:
@@ -65,6 +72,14 @@ class CoarsenessStepResult:
         unsafe_gap = max_disallowed_lfp - max_disallowed_sampled >= 0
         """
         return max(0.0, self.max_disallowed_lfp - self.max_disallowed_sampled)
+
+    def safe_gap_for(self, name: str) -> float:
+        """safe_gap relative to LFP for a named extra sampler."""
+        return max(0.0, self.extra_min_allowed[name] - self.min_allowed_lfp)
+
+    def unsafe_gap_for(self, name: str) -> float:
+        """unsafe_gap relative to LFP for a named extra sampler."""
+        return max(0.0, self.max_disallowed_lfp - self.extra_max_disallowed[name])
 
 
 @dataclass
@@ -108,6 +123,18 @@ class CoarsenessSnapshot:
         if not self.action_results:
             return 0.0
         return float(np.mean([r.unsafe_gap for r in self.action_results]))
+
+    def max_safe_gap_for(self, name: str) -> float:
+        """Maximum safe gap (LFP vs named extra sampler) across all actions."""
+        if not self.action_results:
+            return 0.0
+        return max(r.safe_gap_for(name) for r in self.action_results)
+
+    def mean_safe_gap_for(self, name: str) -> float:
+        """Mean safe gap (LFP vs named extra sampler) across all actions."""
+        if not self.action_results:
+            return 0.0
+        return float(np.mean([r.safe_gap_for(name) for r in self.action_results]))
 
 
 @dataclass
@@ -195,10 +222,12 @@ class CoarsenessEvaluator:
         lfp: LFPPropagator,
         sampler: ForwardSampledBelief,
         pp_shield: Dict,
+        extra_samplers: Optional[Dict[str, Any]] = None,
     ):
         self.lfp = lfp
         self.sampler = sampler
         self.pp_shield = pp_shield
+        self.extra_samplers: Dict[str, Any] = dict(extra_samplers or {})
 
         # Build inverted shield maps: action -> list of safe state indices
         states = list(lfp.ipomdp.states)
@@ -230,9 +259,11 @@ class CoarsenessEvaluator:
         CoarsenessSnapshot
             Coarseness results for this timestep.
         """
-        # Propagate both
+        # Propagate LFP, primary sampler, and any extra samplers in tandem
         self.lfp.propagate(action, obs)
         self.sampler.propagate(action, obs)
+        for extra in self.extra_samplers.values():
+            extra.propagate(action, obs)
 
         # Compute per-action coarseness
         results = []
@@ -245,12 +276,24 @@ class CoarsenessEvaluator:
             max_disallowed_lfp = self.lfp.maximum_disallowed_probability(disallowed) if disallowed else 0.0
             max_disallowed_sampled = self.sampler.maximum_disallowed_probability(disallowed) if disallowed else 0.0
 
+            extra_min: Dict[str, float] = {}
+            extra_max: Dict[str, float] = {}
+            for name, extra in self.extra_samplers.items():
+                extra_min[name] = (
+                    extra.minimum_allowed_probability(allowed) if allowed else 0.0
+                )
+                extra_max[name] = (
+                    extra.maximum_disallowed_probability(disallowed) if disallowed else 0.0
+                )
+
             results.append(CoarsenessStepResult(
                 action=a,
                 min_allowed_lfp=min_allowed_lfp,
                 min_allowed_sampled=min_allowed_sampled,
                 max_disallowed_lfp=max_disallowed_lfp,
                 max_disallowed_sampled=max_disallowed_sampled,
+                extra_min_allowed=extra_min,
+                extra_max_disallowed=extra_max,
             ))
 
         # Step counter based on accumulated snapshots isn't tracked here;
@@ -278,9 +321,11 @@ class CoarsenessEvaluator:
         return report
 
     def restart(self):
-        """Reset both propagators."""
+        """Reset LFP, primary sampler, and any extra samplers."""
         self.lfp.restart()
         self.sampler.restart()
+        for extra in self.extra_samplers.values():
+            extra.restart()
 
 
 # ============================================================

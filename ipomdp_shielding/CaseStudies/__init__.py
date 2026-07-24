@@ -1,5 +1,5 @@
 """Case studies for belief propagation methods."""
 
-from . import Taxinet, CartPole, GridWorldBenchmarks
+from . import Taxinet, TaxiNetV2, CartPole, GridWorldBenchmarks
 
-__all__ = ['Taxinet', 'CartPole', 'GridWorldBenchmarks']
+__all__ = ['Taxinet', 'TaxiNetV2', 'CartPole', 'GridWorldBenchmarks']

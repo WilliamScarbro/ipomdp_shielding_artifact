@@ -1,0 +1,1043 @@
+{
+  "source": {
+    "cp_control_root": "/home/dev/cp-control",
+    "data_dir": "/home/dev/cp-control/data/taxinet",
+    "model_path": "/home/dev/ipomdp_shielding/results/cache/taxinet_v2_earlystop_search_seed42/best_in_band_model.pth",
+    "model_sha256": "52931daf6053e51ba5989493b75289ece2f142696f7d1ddc716a57790425b1ad",
+    "cal_indices_path": "/home/dev/cp-control/train/models/cal_indices.pt",
+    "test_indices_path": "/home/dev/cp-control/train/models/test_indices.pt",
+    "cal_indices_sha256": "69cd8d4568ee21e60be32cf2c5c82e57f81aa8a00863f11572b6a190ac41f101",
+    "test_indices_sha256": "a3f617b6c23fe0b47551420644e26c6e5503a67b9897e2fad46d4964998a53ec"
+  },
+  "data": {
+    "num_files": 55,
+    "total_samples": 5500,
+    "files": [
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_0.npz",
+        "size": 184322110,
+        "sha256": "74c15931580ec4dd56b3148c4cd70f8e59f7650cbb60596189713020a75c7707",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_1.npz",
+        "size": 184322110,
+        "sha256": "378751191bfaf21349be4e7ed7710e9f229ad6de9e42f69ea199bbb14e18fdef",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_10.npz",
+        "size": 184322110,
+        "sha256": "f8eeeaceb4f67a679a642480d8e0f781d2062416c6d552395577d4ff75f583fc",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_11.npz",
+        "size": 184322110,
+        "sha256": "4678049778b42d510432d68b39092759f64cd3d8718a8ce41f07a81e8bcf86ab",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_12.npz",
+        "size": 184322110,
+        "sha256": "09807c8553a9999572a7ce20bb761342c7bf62f227d26a7ba04f8c59a4fef028",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_13.npz",
+        "size": 184322110,
+        "sha256": "27225f08d9034543621b3e8a3d2bf33a9e1ceeba3da9b125179969fecb996d29",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_14.npz",
+        "size": 184322110,
+        "sha256": "d6797e870f0bda1296379989f971eec3ac29c09f08d36c64f9f66a372d585d12",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_15.npz",
+        "size": 184322110,
+        "sha256": "a2c39d5e4f0e4e59bcb2c9b8e397cd43d969dabf53252636cee6352ecadf93a4",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_16.npz",
+        "size": 184322110,
+        "sha256": "a3069c889032af97ca239bc60bb2d20e7bcf59ea13e2433f2238e85946808b77",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_17.npz",
+        "size": 184322110,
+        "sha256": "a6bf82796d4f77181ee90aaf6ca9eb9d5c126d97443cf22c1af01c4e240015f3",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_18.npz",
+        "size": 184322110,
+        "sha256": "f92368d7dd6e0d135189e835b8efa36b84b7c53ce62f3a682942448fd95afd97",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_19.npz",
+        "size": 184322110,
+        "sha256": "c21f774256c4ecd5b3f03535a920f9af14af38ad4c7f5c53050095334172cdbe",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_2.npz",
+        "size": 184322110,
+        "sha256": "f65df5f0dbbe0d47f2d52447ccae56fcafe51301fe6c6618633f19722595f42c",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_20.npz",
+        "size": 184322110,
+        "sha256": "6bb009eead6689098c02a4a9e5bf9b39a01158f54c3e0e109f47710377d5eb6b",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_21.npz",
+        "size": 184322110,
+        "sha256": "844ac3568de42ac0ade02a42c80df351536a1985c44522ae4db7e2edea67ab5a",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_22.npz",
+        "size": 184322110,
+        "sha256": "be5b0c837af773dabe701ecdc938fe593c5e83263a9dcc6e169ae2ba4c98c658",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_23.npz",
+        "size": 184322110,
+        "sha256": "345e9089e98a97c5e438909510ceca928ad3bb538db8cd58d8f4dadc1305b570",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_24.npz",
+        "size": 184322110,
+        "sha256": "10a9910f65d68234fb0861a97ac629748836b7815ff53f06aa929baa59cf91b8",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_25.npz",
+        "size": 184322110,
+        "sha256": "a2543489953077f65ccc264f04238891f1c9a396c4eda5aa4a43e6091ba87f06",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_26.npz",
+        "size": 184322110,
+        "sha256": "6b1b7aea8ae9800aa4546f0a93a6fd8cee2916420617326b99d7dddf81c5cfbc",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_27.npz",
+        "size": 184322110,
+        "sha256": "70c7195c899a6cf2627b594556bba2ba84266591049c26769925cbd60497208e",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_28.npz",
+        "size": 184322110,
+        "sha256": "1604ab50307a59f2e608926e004895c412ed76a59dc9f5b5bdd0090e1abd2949",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_29.npz",
+        "size": 184322110,
+        "sha256": "8c2ce1c7f0a9d27b5093ffc2bde33788e4f13850abdc96ce7548468e708c3390",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_3.npz",
+        "size": 184322110,
+        "sha256": "48ca64972508eadc09ece77209b7789f73c5bb3bcb07cdcbf336af4963bf702b",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_30.npz",
+        "size": 184322110,
+        "sha256": "92079511d66d7d9f8df52d7d9a1a34b14fb664e3254fc50357c7844fa8e43f91",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_31.npz",
+        "size": 184322110,
+        "sha256": "bb85af3e55519fa71e4f7cb54b4a5401a278bb7144652d65a3a1ee130692dfb0",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_32.npz",
+        "size": 184322110,
+        "sha256": "cf80709e6c4780f7a44deffb9fe56a393144fe8201f492eb1a612a98687606c2",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_33.npz",
+        "size": 184322110,
+        "sha256": "6bb4821d826c627a35ee18901cb66386e967eb09a33584ad3d84c14c065bd2c1",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_34.npz",
+        "size": 184322110,
+        "sha256": "79eab53f3ce1517f60ead1de938214d0b4dfac7aed69574066191c2dc9200340",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_35.npz",
+        "size": 184322110,
+        "sha256": "64dc9a3535e59aac9522420090addb58279cc751fbe0dfe69cf0f2609877cad7",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_36.npz",
+        "size": 184322110,
+        "sha256": "ab46d6df96386fa4409ef2a75dc8877892f8241ba904d6f242dbe7f788c41f79",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_37.npz",
+        "size": 184322110,
+        "sha256": "2847cfd386f7230971fb298e2394f46d6d82ad390f846110cb4bf8364e986d63",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_38.npz",
+        "size": 184322110,
+        "sha256": "ca11692afded9e7127afa2e2d9af7148c4db141089ee73eb1576bbc54f185b11",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_39.npz",
+        "size": 184322110,
+        "sha256": "a88c094149f07535791eab4e654eec8b795b6071fe7aa912664ffca62045812c",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_4.npz",
+        "size": 184322110,
+        "sha256": "bc9e7fbaa9946321cad838c43ffc02ed7ac0a2cdf6261cc5fe8d30faa9a615d8",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_40.npz",
+        "size": 184322110,
+        "sha256": "aeca024c95b1dfebf1ed2a72ac932f4bc1e045062cb3ca0fdace8ca006431245",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_41.npz",
+        "size": 184322110,
+        "sha256": "3d5c567c222b0754f1883d306cc25dc6dbbd1d629a6044ab47777c58022d4595",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_42.npz",
+        "size": 184322110,
+        "sha256": "7597ce47ba7d91dcf9168f0c1cccd587c4749e50c0dd05e28eee70529e3dcfe1",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_43.npz",
+        "size": 184322110,
+        "sha256": "2d473f16cbf7e98ed18d02ba70926466a324730d7afc998f80caf8ec59240b86",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_44.npz",
+        "size": 184322110,
+        "sha256": "fb8ff1435a207b2b4568fd22e3c485db2dc7d8063183ddc0e81f1df5dc274c1d",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_45.npz",
+        "size": 184322110,
+        "sha256": "0038d4dc8aafbba07db4f912ddab131757cc66d807521a652d7959ff21c32a14",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_46.npz",
+        "size": 184322110,
+        "sha256": "20ef86317f2da93f22b7ee7a94666eaa5cbec3a114fc62b4e81b5685c387c004",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_47.npz",
+        "size": 184322110,
+        "sha256": "c7343210fc1709d680c8602deef31ed3624f429fe6b359204b5cc7deff5c2cf6",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_48.npz",
+        "size": 184322110,
+        "sha256": "6250ca92293d4620bca7bd5053dd7f6eca4de01584a10f530f927aced7d6f7b2",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_49.npz",
+        "size": 184322110,
+        "sha256": "7a96c271b12704cd1da62ceb719cb3188e7394293560cea7a9d36fa839614064",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_5.npz",
+        "size": 184322110,
+        "sha256": "f276d706245c436365e2ae60e7ce3624e45c66f659b3862c8a0966f158f38239",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_50.npz",
+        "size": 184322110,
+        "sha256": "5c3a55cd5ab474689c1d2ec25b62f254486bd60e89a1e66913851ea1ad631182",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_51.npz",
+        "size": 184322110,
+        "sha256": "f6a9fe02415e19219e295db5a48ddcc43cc3d342816e84575b8629c6a877197f",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_52.npz",
+        "size": 184322110,
+        "sha256": "3c5b303c81c893823d94315eaab8ea8bce2f661bef213a4763d837a13f247162",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_53.npz",
+        "size": 184322110,
+        "sha256": "ca81eb2eca191df4cb4af68b1ca2564728ecf14c178727326d4fbd8c612e03bf",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_54.npz",
+        "size": 184322110,
+        "sha256": "904de35b615ecdebb27fb891733e8f48f18990b87db8560380c476eccd49a06e",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_6.npz",
+        "size": 184322110,
+        "sha256": "ae6877359e483c15cc108405b9077ebb96302db91ddfb523d4fe32f930c0957e",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_7.npz",
+        "size": 184322110,
+        "sha256": "713aab3723bf459b2f855055a4176cab46ac17d9f0becdd57b5a36f9f5518570",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_8.npz",
+        "size": 184322110,
+        "sha256": "b30a4f2eb9ee196379e1f7c47014ca7d358ad796d69cc2b25d9b424497528bbf",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      },
+      {
+        "file": "/home/dev/cp-control/data/taxinet/data_9.npz",
+        "size": 184322110,
+        "sha256": "0d322a2703ac6646456d12967460ab7dfee8daac83adcfe8685c2d6a5b19175a",
+        "images_shape": [
+          100,
+          240,
+          320,
+          3
+        ],
+        "labels_shape": [
+          100,
+          2
+        ]
+      }
+    ]
+  },
+  "class_mapping": {
+    "cte_index_to_signed": {
+      "0": -2,
+      "1": -1,
+      "2": 0,
+      "3": 1,
+      "4": 2
+    },
+    "he_index_to_signed": {
+      "0": -1,
+      "1": 0,
+      "2": 1
+    }
+  },
+  "split_sizes": {
+    "cal": 825,
+    "test": 825
+  },
+  "test_metrics": {
+    "cte_accuracy": 0.8715151515151515,
+    "he_accuracy": 0.9672727272727273,
+    "joint_accuracy": 0.8460606060606061
+  },
+  "qhat": {
+    "conf95": {
+      "alpha": 0.05,
+      "cte_qhat": 0.8258514404296875,
+      "he_qhat": 0.6056151390075684
+    },
+    "conf99": {
+      "alpha": 0.01,
+      "cte_qhat": 0.9720184803009033,
+      "he_qhat": 0.9529603123664856
+    },
+    "conf995": {
+      "alpha": 0.005,
+      "cte_qhat": 0.9866088628768921,
+      "he_qhat": 0.9817823171615601
+    }
+  },
+  "conformal_artifact_source": "locally_regenerated_from_calibration_split_with_top1_nonempty_repair",
+  "paired_axis_validation": {
+    "conf95": {
+      "cte": {
+        "empty_set_violations": 0,
+        "argmax_not_in_set_violations": 0,
+        "empirical_coverage": 0.9503030303030303,
+        "mean_set_size": 1.1927272727272726
+      },
+      "he": {
+        "empty_set_violations": 0,
+        "argmax_not_in_set_violations": 0,
+        "empirical_coverage": 0.9793939393939394,
+        "mean_set_size": 1.029090909090909
+      }
+    },
+    "conf99": {
+      "cte": {
+        "empty_set_violations": 0,
+        "argmax_not_in_set_violations": 0,
+        "empirical_coverage": 0.9963636363636363,
+        "mean_set_size": 1.7818181818181817
+      },
+      "he": {
+        "empty_set_violations": 0,
+        "argmax_not_in_set_violations": 0,
+        "empirical_coverage": 0.9987878787878788,
+        "mean_set_size": 1.4606060606060607
+      }
+    },
+    "conf995": {
+      "cte": {
+        "empty_set_violations": 0,
+        "argmax_not_in_set_violations": 0,
+        "empirical_coverage": 0.9987878787878788,
+        "mean_set_size": 2.1903030303030304
+      },
+      "he": {
+        "empty_set_violations": 0,
+        "argmax_not_in_set_violations": 0,
+        "empirical_coverage": 1.0,
+        "mean_set_size": 1.7733333333333334
+      }
+    }
+  },
+  "conformal_summaries": {
+    "conf95": {
+      "cte": {
+        "empty_count": 0,
+        "size_counts": {
+          "1": 666,
+          "2": 159
+        },
+        "mean_size": 1.1927272727272726,
+        "empirical_coverage": 0.9503030303030303
+      },
+      "he": {
+        "empty_count": 0,
+        "size_counts": {
+          "1": 801,
+          "2": 24
+        },
+        "mean_size": 1.029090909090909,
+        "empirical_coverage": 0.9793939393939394
+      },
+      "top1_nonempty_repairs": {
+        "cte": 0,
+        "he": 0
+      },
+      "validation": {
+        "cte": {
+          "empty_set_violations": 0,
+          "argmax_not_in_set_violations": 0
+        },
+        "he": {
+          "empty_set_violations": 0,
+          "argmax_not_in_set_violations": 0
+        }
+      }
+    },
+    "conf99": {
+      "cte": {
+        "empty_count": 0,
+        "size_counts": {
+          "1": 344,
+          "2": 354,
+          "3": 90,
+          "4": 37
+        },
+        "mean_size": 1.7818181818181817,
+        "empirical_coverage": 0.9963636363636363
+      },
+      "he": {
+        "empty_count": 0,
+        "size_counts": {
+          "1": 521,
+          "2": 228,
+          "3": 76
+        },
+        "mean_size": 1.4606060606060607,
+        "empirical_coverage": 0.9987878787878788
+      },
+      "top1_nonempty_repairs": {
+        "cte": 0,
+        "he": 0
+      },
+      "validation": {
+        "cte": {
+          "empty_set_violations": 0,
+          "argmax_not_in_set_violations": 0
+        },
+        "he": {
+          "empty_set_violations": 0,
+          "argmax_not_in_set_violations": 0
+        }
+      }
+    },
+    "conf995": {
+      "cte": {
+        "empty_count": 0,
+        "size_counts": {
+          "1": 256,
+          "2": 314,
+          "3": 117,
+          "4": 118,
+          "5": 20
+        },
+        "mean_size": 2.1903030303030304,
+        "empirical_coverage": 0.9987878787878788
+      },
+      "he": {
+        "empty_count": 0,
+        "size_counts": {
+          "1": 362,
+          "2": 288,
+          "3": 175
+        },
+        "mean_size": 1.7733333333333334,
+        "empirical_coverage": 1.0
+      },
+      "top1_nonempty_repairs": {
+        "cte": 0,
+        "he": 0
+      },
+      "validation": {
+        "cte": {
+          "empty_set_violations": 0,
+          "argmax_not_in_set_violations": 0
+        },
+        "he": {
+          "empty_set_violations": 0,
+          "argmax_not_in_set_violations": 0
+        }
+      }
+    }
+  },
+  "outputs": {
+    "compiler_dir": "/home/dev/ipomdp_shielding/ipomdp_shielding_/ipomdp_shielding/CaseStudies/TaxiNetV2/artifacts/compiler/lib/acc90",
+    "perception_dir": "/home/dev/ipomdp_shielding/ipomdp_shielding_/ipomdp_shielding/CaseStudies/TaxiNetV2/artifacts/perception"
+  }
+}

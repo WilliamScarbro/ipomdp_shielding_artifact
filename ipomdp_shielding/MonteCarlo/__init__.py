@@ -68,8 +68,14 @@ from .neural_action_selector import (
 # Perception models
 from .perception_models import (
     PerceptionModel,
+    PairedPerceptionEvent,
     UniformPerceptionModel,
     AdversarialPerceptionModel,
+    EmpiricalAxisPerceptionModel,
+    PairedEmpiricalTaxiNetPerception,
+    AxisPairedTaxiNetPerception,
+    ConditionalConformalTaxiNetPerception,
+    ModularConditionalConformalTaxiNetPerception,
     LegacyPerceptionAdapter,
 )
 
@@ -145,8 +151,14 @@ __all__ = [
     "ObservationActionEncoder",
     # Perception models
     "PerceptionModel",
+    "PairedPerceptionEvent",
     "UniformPerceptionModel",
     "AdversarialPerceptionModel",
+    "EmpiricalAxisPerceptionModel",
+    "PairedEmpiricalTaxiNetPerception",
+    "AxisPairedTaxiNetPerception",
+    "ConditionalConformalTaxiNetPerception",
+    "ModularConditionalConformalTaxiNetPerception",
     "LegacyPerceptionAdapter",
     # Fixed realization and optimization
     "FixedRealizationPerceptionModel",

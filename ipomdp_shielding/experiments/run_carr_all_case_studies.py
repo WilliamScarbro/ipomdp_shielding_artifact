@@ -1,9 +1,16 @@
-"""Run artifact Carr support-based shielding on the bundled case studies.
+"""Run Carr support-based shielding on all four case studies.
 
 Builds the support-MDP offline once per case study, then runs 200 trials with
 the RL selector under both uniform and adversarial perception regimes.
-Uses the same bundled RL-agent and optimized-realization caches as the artifact
-threshold sweep. Saves one JSON per case study to `results/experiment/carr/`.
+Reuses the same RL agent and optimised-realization caches as the expanded
+threshold sweep (threshold_sweep_expanded).
+
+Saves one JSON per case study to:
+    results/threshold_sweep_expanded/{cs_name}_carr_results.json
+
+Usage:
+    python -m ipomdp_shielding.experiments.run_carr_all_case_studies
+    python -m ipomdp_shielding.experiments.run_carr_all_case_studies --dry-run
 """
 
 import dataclasses
@@ -26,14 +33,15 @@ from ..MonteCarlo import (
 )
 
 
-OUTPUT_DIR = "results/experiment/carr"
+OUTPUT_DIR = "results/threshold_sweep_expanded"
 
+# Same trial budgets as the expanded threshold sweep.
 CASE_STUDY_PARAMS = {
-    "taxinet": {"num_trials": 200, "trial_length": 20, "config_name": "rl_shield_taxinet_artifact"},
-    "cartpole": {"num_trials": 200, "trial_length": 15, "config_name": "rl_shield_cartpole_artifact"},
-    "obstacle": {"num_trials": 200, "trial_length": 25, "config_name": "rl_shield_obstacle_artifact"},
+    "taxinet":   {"num_trials": 200, "trial_length": 20},
+    "cartpole":  {"num_trials": 200, "trial_length": 15},
+    "obstacle":  {"num_trials": 200, "trial_length": 25},
     "refuel_v2": {"num_trials": 200, "trial_length": 30,
-                  "config_name": "rl_shield_refuel_v2_artifact"},
+                  "config_name": "rl_shield_refuel_v2"},
 }
 
 # Bail out if the support-MDP BFS exceeds this many support sets.
@@ -170,7 +178,7 @@ def build_carr_factory(ipomdp, pp_shield):
 # ============================================================
 
 def _load_config(cs_name, config_name=None):
-    module = config_name or f"rl_shield_{cs_name}_artifact"
+    module = config_name or f"rl_shield_{cs_name}_final"
     mod = importlib.import_module(
         f".configs.{module}",
         package="ipomdp_shielding.experiments",
@@ -229,7 +237,7 @@ def run_carr_for_case_study(cs_name, params, dry_run=False):
         print(f"\n  Carr infeasible: {exc}")
         return {"status": "infeasible", "reason": str(exc)}
 
-    # Load bundled RL agents and optimised realizations.
+    # Load RL agent and optimised realizations (reuses prelim/v2 caches).
     rl_selector, optimized_perceptions, setup_info = setup(ipomdp, pp_shield, exp_config)
 
     all_actions = list(ipomdp.actions)

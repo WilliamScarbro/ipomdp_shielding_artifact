@@ -228,6 +228,36 @@ def taxinet_perception(
     return perception_imdp
 
 
+def taxinet_train_test_split(
+    train_fraction: float = 0.8,
+    seed: Optional[int] = None,
+) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]],
+           List[Tuple[int, int]], List[Tuple[int, int]]]:
+    """Load and split CTE/HE data into train/test using a deterministic seed.
+
+    Returns
+    -------
+    (he_train, he_test, cte_train, cte_test)
+        Same split semantics as build_taxinet_ipomdp uses internally, exposed
+        so other builders can share the train data.
+    """
+    if seed is not None:
+        random.seed(seed)
+
+    cte_data = get_cte_data()
+    he_data = get_he_data()
+
+    random.shuffle(cte_data)
+    cte_train_index = int(len(cte_data) * train_fraction)
+    cte_train, cte_test = cte_data[:cte_train_index], cte_data[cte_train_index:]
+
+    random.shuffle(he_data)
+    he_train_index = int(len(he_data) * train_fraction)
+    he_train, he_test = he_data[:he_train_index], he_data[he_train_index:]
+
+    return he_train, he_test, cte_train, cte_test
+
+
 def build_taxinet_ipomdp(
     confidence_method: str = "Clopper_Pearson",
     alpha: float = 0.05,
@@ -249,19 +279,9 @@ def build_taxinet_ipomdp(
     tuple
         (ipomdp, dynamic_shield, test_cte_model, test_he_model)
     """
-    if seed is not None:
-        random.seed(seed)
-
-    cte_data = get_cte_data()
-    he_data = get_he_data()
-
-    cte_train_index = int(len(cte_data) * train_fraction)
-    random.shuffle(cte_data)
-    cte_train, cte_test = cte_data[:cte_train_index], cte_data[cte_train_index:]
-
-    he_train_index = int(len(he_data) * train_fraction)
-    random.shuffle(he_data)
-    he_train, he_test = he_data[:he_train_index], he_data[he_train_index:]
+    he_train, he_test, cte_train, cte_test = taxinet_train_test_split(
+        train_fraction=train_fraction, seed=seed
+    )
 
     perc_imdp = taxinet_perception(confidence_method, alpha, he_train, cte_train,
                                     smoothing=smoothing)

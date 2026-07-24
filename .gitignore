@@ -2,6 +2,12 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
+venv/
 build/
 dist/
 *.egg-info/
+
+# Generated plot outputs written next to the bundled result JSONs by the
+# experiment runners; the canonical figure outputs live in figures/.
+results/**/*.png
+results/sweep_v7/evaluation_summary.md

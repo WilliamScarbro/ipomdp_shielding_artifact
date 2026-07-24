@@ -7,12 +7,22 @@ Nature can be cooperative (random) or adversarial (maximizing failure probabilit
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List, Optional, Set
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
 import random
 import numpy as np
 from scipy.optimize import linprog
 
 from ..Models.ipomdp import IPOMDP
+
+
+@dataclass(frozen=True)
+class PairedPerceptionEvent:
+    """Synchronized point and conformal observations for one sampled event."""
+
+    point_observation: Any
+    conformal_observation: Any
 
 
 class PerceptionModel(ABC):
@@ -51,6 +61,17 @@ class PerceptionModel(ABC):
             Sampled observation within the interval constraints
         """
         pass
+
+    def begin_trajectory(
+        self,
+        ipomdp: Optional[IPOMDP] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Prepare for a new trajectory or episode."""
+        del ipomdp, context
+
+    def end_trajectory(self) -> None:
+        """Clean up trajectory-scoped state."""
 
     def sample_distribution(
         self,
@@ -119,6 +140,31 @@ class UniformPerceptionModel(PerceptionModel):
     then samples an observation from that distribution.
     """
 
+    def __init__(self):
+        self._active_realization: Optional[Dict[Any, Dict[Any, float]]] = None
+
+    def begin_trajectory(
+        self,
+        ipomdp: Optional[IPOMDP] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Sample one full interval realization for the entire trajectory."""
+        del context
+        if ipomdp is None:
+            self._active_realization = None
+            return
+
+        self._active_realization = {}
+        for state in ipomdp.states:
+            if state == "FAIL":
+                continue
+            self._active_realization[state] = self._sample_valid_distribution(
+                state, ipomdp
+            )
+
+    def end_trajectory(self) -> None:
+        self._active_realization = None
+
     def sample_observation(
         self,
         state: Any,
@@ -129,10 +175,24 @@ class UniformPerceptionModel(PerceptionModel):
         if state == "FAIL":
             return "FAIL"
 
-        dist = self._sample_valid_distribution(state, ipomdp)
+        dist = self.sample_distribution(state, ipomdp, context)
         observations = list(dist.keys())
         probs = [dist[o] for o in observations]
         return random.choices(observations, weights=probs, k=1)[0]
+
+    def sample_distribution(
+        self,
+        state: Any,
+        ipomdp: IPOMDP,
+        context: Optional[Dict[str, Any]] = None
+    ) -> Dict[Any, float]:
+        """Return the active trajectory realization or sample a fresh row."""
+        del context
+        if state == "FAIL":
+            return {"FAIL": 1.0}
+        if self._active_realization is not None:
+            return self._active_realization[state].copy()
+        return self._sample_valid_distribution(state, ipomdp)
 
     def _sample_valid_distribution(
         self,
@@ -470,6 +530,390 @@ class AdversarialPerceptionModel(PerceptionModel):
             probs = probs / total
 
         return probs
+
+
+class EmpiricalAxisPerceptionModel(PerceptionModel):
+    """Sample TaxiNet-style observations from empirical per-axis data.
+
+    The CTE and HE axes are sampled independently conditional on the current
+    true state, matching the cp-control PRISM construction.
+    """
+
+    def __init__(
+        self,
+        cte_data: Iterable[Tuple[Any, Any]],
+        he_data: Iterable[Tuple[Any, Any]],
+        fail_observation: Any = "FAIL",
+    ):
+        self.fail_observation = fail_observation
+        self.cte_samples = self._group_axis_samples(cte_data)
+        self.he_samples = self._group_axis_samples(he_data)
+
+    @staticmethod
+    def _group_axis_samples(data: Iterable[Tuple[Any, Any]]) -> Dict[Any, List[Any]]:
+        grouped: Dict[Any, List[Any]] = defaultdict(list)
+        for true_value, observed_value in data:
+            grouped[true_value].append(observed_value)
+        return dict(grouped)
+
+    def sample_observation(
+        self,
+        state: Any,
+        ipomdp: IPOMDP,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Any:
+        if state == "FAIL":
+            return self.fail_observation
+
+        true_cte, true_he = state
+        cte_candidates = self.cte_samples.get(true_cte)
+        he_candidates = self.he_samples.get(true_he)
+        if not cte_candidates or not he_candidates:
+            dist = self._uniform_distribution(state, ipomdp)
+            observations = list(dist.keys())
+            probs = [dist[o] for o in observations]
+            return random.choices(observations, weights=probs, k=1)[0]
+
+        return (
+            random.choice(cte_candidates),
+            random.choice(he_candidates),
+        )
+
+    def sample_distribution(
+        self,
+        state: Any,
+        ipomdp: IPOMDP,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Dict[Any, float]:
+        if state == "FAIL":
+            return {self.fail_observation: 1.0}
+        true_cte, true_he = state
+        cte_candidates = self.cte_samples.get(true_cte, [])
+        he_candidates = self.he_samples.get(true_he, [])
+        if not cte_candidates or not he_candidates:
+            return self._uniform_distribution(state, ipomdp)
+
+        dist: Dict[Any, float] = defaultdict(float)
+        weight = 1.0 / (len(cte_candidates) * len(he_candidates))
+        for cte_obs in cte_candidates:
+            for he_obs in he_candidates:
+                dist[(cte_obs, he_obs)] += weight
+        return dict(dist)
+
+
+class PairedEmpiricalTaxiNetPerception:
+    """Sample paired TaxiNetV2 point/conformal events by independent axes.
+
+    Each axis sample preserves the row-level pairing between the point estimate
+    and conformal set on that axis. CTE and HE axes are sampled independently
+    conditional on their true values, matching the cp-control factorization.
+    """
+
+    def __init__(
+        self,
+        paired_observations: Iterable[Any],
+        fail_observation: Any = "FAIL",
+    ):
+        self.fail_observation = fail_observation
+        self.cte_samples: Dict[Any, List[Tuple[Any, Any]]] = defaultdict(list)
+        self.he_samples: Dict[Any, List[Tuple[Any, Any]]] = defaultdict(list)
+
+        for sample in paired_observations:
+            true_cte, true_he = sample.true_state
+            point_cte, point_he = sample.point_observation
+            conformal_cte, conformal_he = sample.conformal_observation
+            self.cte_samples[true_cte].append((point_cte, conformal_cte))
+            self.he_samples[true_he].append((point_he, conformal_he))
+
+        self.cte_samples = dict(self.cte_samples)
+        self.he_samples = dict(self.he_samples)
+
+    def sample_event(self, state: Any) -> PairedPerceptionEvent:
+        if state == "FAIL":
+            return PairedPerceptionEvent(
+                point_observation=self.fail_observation,
+                conformal_observation=self.fail_observation,
+            )
+
+        true_cte, true_he = state
+        cte_candidates = self.cte_samples.get(true_cte)
+        he_candidates = self.he_samples.get(true_he)
+        if not cte_candidates or not he_candidates:
+            raise ValueError(f"No paired TaxiNetV2 perception samples for state {state!r}")
+
+        point_cte, conformal_cte = random.choice(cte_candidates)
+        point_he, conformal_he = random.choice(he_candidates)
+        return PairedPerceptionEvent(
+            point_observation=(point_cte, point_he),
+            conformal_observation=(conformal_cte, conformal_he),
+        )
+
+
+class AxisPairedTaxiNetPerception:
+    """Sample TaxiNetV2 point/conformal events from explicit axis-paired rows.
+
+    A sampled axis row keeps the DNN argmax and conformal set from the same
+    model evaluation together. CTE and HE are sampled independently conditional
+    on their true axis values, matching the cp-control perception model.
+    """
+
+    def __init__(
+        self,
+        cte_rows: Iterable[Any],
+        he_rows: Iterable[Any],
+        fail_observation: Any = "FAIL",
+    ):
+        self.fail_observation = fail_observation
+        self.cte_samples = self._group_axis_rows(cte_rows)
+        self.he_samples = self._group_axis_rows(he_rows)
+
+    @staticmethod
+    def _axis_row_values(row: Any) -> Tuple[Any, Any, Any]:
+        if hasattr(row, "true_value"):
+            return (
+                row.true_value,
+                row.point_value,
+                row.conformal_observation,
+            )
+        true_value, point_value, conformal_observation = row
+        return true_value, point_value, conformal_observation
+
+    @classmethod
+    def _group_axis_rows(cls, rows: Iterable[Any]) -> Dict[Any, List[Tuple[Any, Any]]]:
+        grouped: Dict[Any, List[Tuple[Any, Any]]] = defaultdict(list)
+        for row in rows:
+            true_value, point_value, conformal_observation = cls._axis_row_values(row)
+            if conformal_observation == "FAIL":
+                grouped[true_value].append((point_value, conformal_observation))
+                continue
+            if point_value not in conformal_observation:
+                raise ValueError(
+                    f"Axis-paired TaxiNetV2 row has point value {point_value!r} "
+                    f"outside conformal observation {conformal_observation!r}"
+                )
+            grouped[true_value].append((point_value, conformal_observation))
+        return dict(grouped)
+
+    def sample_event(self, state: Any) -> PairedPerceptionEvent:
+        if state == "FAIL":
+            return PairedPerceptionEvent(
+                point_observation=self.fail_observation,
+                conformal_observation=self.fail_observation,
+            )
+
+        true_cte, true_he = state
+        cte_candidates = self.cte_samples.get(true_cte)
+        if not cte_candidates:
+            raise ValueError(f"No paired TaxiNetV2 CTE samples for true value {true_cte!r}")
+        he_candidates = self.he_samples.get(true_he)
+        if not he_candidates:
+            raise ValueError(f"No paired TaxiNetV2 HE samples for true value {true_he!r}")
+
+        point_cte, conformal_cte = random.choice(cte_candidates)
+        point_he, conformal_he = random.choice(he_candidates)
+        return PairedPerceptionEvent(
+            point_observation=(point_cte, point_he),
+            conformal_observation=(conformal_cte, conformal_he),
+        )
+
+
+class ConditionalConformalTaxiNetPerception:
+    """Two-stage TaxiNetV2 conformal perception model.
+
+    Stage 1 samples a point estimate from empirical ``P(estimate | true_state)``.
+    Stage 2 samples a conformal set from empirical
+    ``P(set | true_state, estimate)``.
+
+    This matches the intended semantics more explicitly than sampling a joint
+    row-level ``(estimate, set)`` event directly, while remaining empirically
+    equivalent when both stages come from the same paired artifact family.
+    """
+
+    def __init__(
+        self,
+        point_cte_data: Iterable[Tuple[Any, Any]],
+        point_he_data: Iterable[Tuple[Any, Any]],
+        conditional_cte_sets: Dict[Tuple[Any, Any], List[Any]],
+        conditional_he_sets: Dict[Tuple[Any, Any], List[Any]],
+        fail_observation: Any = "FAIL",
+    ):
+        self.fail_observation = fail_observation
+        self.point_model = EmpiricalAxisPerceptionModel(
+            point_cte_data,
+            point_he_data,
+            fail_observation=fail_observation,
+        )
+        self.conditional_cte_sets = {
+            key: list(values) for key, values in conditional_cte_sets.items()
+        }
+        self.conditional_he_sets = {
+            key: list(values) for key, values in conditional_he_sets.items()
+        }
+
+    def sample_event(self, state: Any) -> PairedPerceptionEvent:
+        if state == "FAIL":
+            return PairedPerceptionEvent(
+                point_observation=self.fail_observation,
+                conformal_observation=self.fail_observation,
+            )
+
+        point_observation = self.point_model.sample_observation(
+            state,
+            ipomdp=None,  # empirical path does not use the IPOMDP fallback
+        )
+        true_cte, true_he = state
+        point_cte, point_he = point_observation
+
+        cte_candidates = self.conditional_cte_sets.get((true_cte, point_cte))
+        if not cte_candidates:
+            raise ValueError(
+                f"No TaxiNetV2 conditional CTE conformal samples for "
+                f"(true, point)=({true_cte!r}, {point_cte!r})"
+            )
+        he_candidates = self.conditional_he_sets.get((true_he, point_he))
+        if not he_candidates:
+            raise ValueError(
+                f"No TaxiNetV2 conditional HE conformal samples for "
+                f"(true, point)=({true_he!r}, {point_he!r})"
+            )
+
+        return PairedPerceptionEvent(
+            point_observation=point_observation,
+            conformal_observation=(
+                random.choice(cte_candidates),
+                random.choice(he_candidates),
+            ),
+        )
+
+
+class ModularConditionalConformalTaxiNetPerception(PerceptionModel):
+    """TaxiNetV2 conformal perception seeded by a modular point realization.
+
+    Stage 1 samples the point estimate from a modular interval perception model
+    over the TaxiNetV2 point-estimate IPOMDP.
+    Stage 2 samples the conformal set from empirical
+    ``P(set | true_state, estimate)`` artifacts.
+    """
+
+    def __init__(
+        self,
+        point_perception: PerceptionModel,
+        point_ipomdp: IPOMDP,
+        conditional_cte_sets: Dict[Tuple[Any, Any], List[Any]],
+        conditional_he_sets: Dict[Tuple[Any, Any], List[Any]],
+        fail_observation: Any = "FAIL",
+        max_resample_attempts: int = 64,
+    ):
+        self.point_perception = point_perception
+        self.point_ipomdp = point_ipomdp
+        self.fail_observation = fail_observation
+        self.max_resample_attempts = max_resample_attempts
+        self.conditional_cte_sets = {
+            key: list(values) for key, values in conditional_cte_sets.items()
+        }
+        self.conditional_he_sets = {
+            key: list(values) for key, values in conditional_he_sets.items()
+        }
+
+    def _lookup_conditional_candidates(
+        self,
+        state: Any,
+        point_observation: Any,
+    ) -> Tuple[Optional[List[Any]], Optional[List[Any]]]:
+        true_cte, true_he = state
+        point_cte, point_he = point_observation
+        return (
+            self.conditional_cte_sets.get((true_cte, point_cte)),
+            self.conditional_he_sets.get((true_he, point_he)),
+        )
+
+    def begin_trajectory(
+        self,
+        ipomdp: Optional[IPOMDP] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        if hasattr(self.point_perception, "begin_trajectory"):
+            self.point_perception.begin_trajectory(self.point_ipomdp, context)
+
+    def end_trajectory(self) -> None:
+        if hasattr(self.point_perception, "end_trajectory"):
+            self.point_perception.end_trajectory()
+
+    def _sample_supported_point_observation(
+        self,
+        state: Any,
+        context: Optional[Dict[str, Any]],
+    ) -> Tuple[Any, List[Any], List[Any]]:
+        for _ in range(self.max_resample_attempts):
+            point_observation = self.point_perception.sample_observation(
+                state,
+                self.point_ipomdp,
+                context,
+            )
+            cte_candidates, he_candidates = self._lookup_conditional_candidates(
+                state,
+                point_observation,
+            )
+            if cte_candidates and he_candidates:
+                return point_observation, cte_candidates, he_candidates
+
+        base_dist = self.point_perception.sample_distribution(
+            state,
+            self.point_ipomdp,
+            context,
+        )
+        supported = []
+        weights = []
+        for point_observation, weight in base_dist.items():
+            cte_candidates, he_candidates = self._lookup_conditional_candidates(
+                state,
+                point_observation,
+            )
+            if cte_candidates and he_candidates and weight > 0.0:
+                supported.append((point_observation, cte_candidates, he_candidates))
+                weights.append(weight)
+
+        if not supported:
+            raise ValueError(
+                f"No TaxiNetV2 conditional conformal support for modular point samples "
+                f"from state {state!r}"
+            )
+
+        idx = random.choices(range(len(supported)), weights=weights, k=1)[0]
+        return supported[idx]
+
+    def sample_event(
+        self,
+        state: Any,
+        ipomdp: Optional[IPOMDP] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> PairedPerceptionEvent:
+        del ipomdp
+        if state == "FAIL":
+            return PairedPerceptionEvent(
+                point_observation=self.fail_observation,
+                conformal_observation=self.fail_observation,
+            )
+
+        point_observation, cte_candidates, he_candidates = (
+            self._sample_supported_point_observation(state, context)
+        )
+
+        return PairedPerceptionEvent(
+            point_observation=point_observation,
+            conformal_observation=(
+                random.choice(cte_candidates),
+                random.choice(he_candidates),
+            ),
+        )
+
+    def sample_observation(
+        self,
+        state: Any,
+        ipomdp: IPOMDP,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Any:
+        return self.sample_event(state, ipomdp, context).conformal_observation
 
 
 class LegacyPerceptionAdapter(PerceptionModel):

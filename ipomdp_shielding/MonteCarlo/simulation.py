@@ -76,43 +76,51 @@ def run_single_trial(
         "history": history
     }
 
-    for step in range(trial_length):
-        # Check for failure
-        if state == "FAIL":
-            outcome = "fail"
-            fail_step = step
-            break
+    perception.begin_trajectory(ipomdp, perception_context)
+    try:
+        for step in range(trial_length):
+            # Check for failure
+            if state == "FAIL":
+                outcome = "fail"
+                fail_step = step
+                break
 
-        # Get observation using perception model
-        obs = perception.sample_observation(state, ipomdp, perception_context)
+            # Get observation using perception model
+            obs = perception.sample_observation(state, ipomdp, perception_context)
 
-        # Store in history
-        history.append((obs, action))
+            # Store in history
+            history.append((obs, action))
 
-        if store_trajectory:
-            trajectory.append((state, obs, action))
+            if store_trajectory:
+                trajectory.append((state, obs, action))
 
-        # Get allowed actions from shield
-        allowed_actions = rt_shield.next_actions((obs, action))
+            # Get allowed actions from shield
+            allowed_actions = rt_shield.next_actions((obs, action))
 
-        # Check if stuck (no allowed actions)
-        if not allowed_actions:
-            outcome = "stuck"
-            steps_completed = step
-            break
+            # Check if stuck (no allowed actions)
+            if not allowed_actions:
+                outcome = "stuck"
+                steps_completed = step
+                break
 
-        # Build context for action selector
-        action_selector_context = {
-            "rt_shield": rt_shield,
-            "history": history
-        }
+            # Build context for action selector
+            action_selector_context = {
+                "rt_shield": rt_shield,
+                "history": history
+            }
 
-        # Select next action
-        action = action_selector.select(history, allowed_actions, context=action_selector_context)
+            # Select next action
+            action = action_selector.select(
+                history,
+                allowed_actions,
+                context=action_selector_context,
+            )
 
-        # Evolve state
-        state = ipomdp.evolve(state, action)
-        steps_completed = step + 1
+            # Evolve state
+            state = ipomdp.evolve(state, action)
+            steps_completed = step + 1
+    finally:
+        perception.end_trajectory()
 
     # If loop completed without failure or stuck, outcome remains "safe"
 

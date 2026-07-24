@@ -5,10 +5,6 @@ Run from project root:
 """
 
 import numpy as np
-import sys
-
-# Add parent to path for imports
-sys.path.insert(0, '/home/scarbro/claude')
 
 from ipomdp_shielding.Propagators.belief_polytope import (
     BeliefPolytope, compute_volume, _enumerate_vertices, _find_interior_point_projected,

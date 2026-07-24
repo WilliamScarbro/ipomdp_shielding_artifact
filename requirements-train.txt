@@ -1,0 +1,10 @@
+# Optional extras: only needed to RETRAIN controllers / rebuild perception
+# artifacts from scratch (CaseStudies/CartPole/{train_lowacc,data_preparation,
+# training/*}). The paper reproduction path does NOT require these — the trained
+# agents and perception artifacts are bundled under results/cache/ and the
+# CaseStudies/*/artifacts directories.
+--extra-index-url https://download.pytorch.org/whl/cpu
+gymnasium==0.29.1
+torchvision==0.19.1+cpu
+pillow==10.4.0
+tqdm==4.66.5
