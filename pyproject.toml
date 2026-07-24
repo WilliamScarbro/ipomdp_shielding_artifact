@@ -8,6 +8,10 @@ version = "0.1.0"
 description = "IPOMDP shielding experiments"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
+authors = [
+    { name = "William Scarbro" },
+    { name = "Ravi Mangal" },
+]
 
 [tool.setuptools.packages.find]
 where = ["."]
