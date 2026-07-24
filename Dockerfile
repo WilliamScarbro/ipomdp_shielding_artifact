@@ -11,5 +11,5 @@ RUN pip install --upgrade pip \
     && pip install -r requirements.txt \
     && pip install --no-deps -e .
 
-# Default: regenerate every paper figure/table from the bundled results into ./figures
-CMD ["./run_experiments.sh", "figures"]
+# Default: fast end-to-end check that also regenerates every figure into ./figures
+CMD ["./run_experiments.sh", "smoke_test"]
