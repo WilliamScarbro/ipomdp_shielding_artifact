@@ -57,7 +57,19 @@ re-executes the underlying Monte Carlo experiments.
 \subsection*{How to access}
 Archived on Zenodo at \href{https://doi.org/10.5281/zenodo.21539082}{10.5281/zenodo.21539082}
 (MIT-licensed). Source is also at
-\url{https://github.com/WilliamScarbro/ipomdp_shielding_artifact}.
+\url{https://github.com/WilliamScarbro/ipomdp_shielding_artifact}. The accepted
+paper is bundled with the artifact as \code{paper.pdf}.
+
+\subsection*{Technical skills required to review the artifact}
+Reviewing the artifact requires only basic command-line and Docker proficiency:
+building an image (\code{docker build}) and running a container with a volume
+mount (\code{docker run -v}). No GPU, cluster, licensed software, or special
+hardware is needed, and the artifact requires no network access at run time.
+Interpreting the regenerated figures and tables benefits from --- but does not
+require --- familiarity with POMDPs, interval/robust Markov models, and runtime
+shielding; the mapping from each command to its paper figure/table is given in
+\code{README.md} so that outputs can be checked against the paper without domain
+expertise.
 
 \subsection*{Hardware dependencies}
 Any x86-64 machine. CPU-only --- no GPU. ${\ge}8$\,GB RAM (the figure path uses

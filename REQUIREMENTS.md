@@ -9,6 +9,13 @@ Hardware and software needed to evaluate this artifact.
   Python environment). No network access is required at run time — all trained
   controllers, optimized perception realizations, and result JSONs are bundled.
 
+## Technical skills required to review
+Only basic command-line and Docker proficiency: `docker build` and `docker run`
+with a volume mount. No GPU, cluster, licensed software, or special hardware.
+Interpreting the figures/tables benefits from — but does not require —
+familiarity with POMDPs and runtime shielding; `README.md` maps every command to
+its paper figure/table so outputs can be checked against the paper directly.
+
 ## Software
 - **Docker Engine** (any recent version). Nothing else is required — the image
   pins the entire environment. Base image: `python:3.11-slim`.
